@@ -11,6 +11,7 @@
     - `pip install serverless`
 
 3. Create a dir and base objects virtialenv and serverless
+
     - `serverless create --template aws-python --path lending-mobile-api`
     - `virtual env lending-mobile-api`
 
