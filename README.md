@@ -3,8 +3,10 @@
 ## Initial Set Up
 
 1. Ensure u have python 2.7 (aws uses that)
-  1a.
+    1a.
+
 2. Install serverless framework & virtialenv
+
     - `pip install virtialenv`
     - `pip install serverless`
 
