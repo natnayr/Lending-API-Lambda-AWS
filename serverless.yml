@@ -16,8 +16,8 @@ service: lending-mobile-api
 provider:
   name: aws
   credentials:
-    accessKeyId: AKIAIXMWUH6INKFQNVZA
-    secretAccessKey: 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
+    accessKeyId: ${env:aws_key}
+    secretAccessKey: ${env:aws_secret}
   region: ap-southeast-1
   runtime: python2.7
 
