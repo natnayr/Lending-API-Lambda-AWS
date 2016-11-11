@@ -20,6 +20,7 @@ provider:
     secretAccessKey: ${env:aws_secret}
   region: ap-southeast-1
   runtime: python2.7
+  cfLogs: true
 
 # you can overwrite defaults here
 #  stage: dev

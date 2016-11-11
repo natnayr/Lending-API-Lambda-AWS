@@ -7,7 +7,7 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 sys.path.append(os.path.join(os.path.dirname(__file__),
-                    "./lib/python2.7/site-packages"))
+                            "./lib/python2.7/site-packages"))
 
 import pg8000
 import datetime
@@ -69,9 +69,9 @@ def get_live_loans(event, context):
 
 def get_loan_details(event, context):
 
-    if not event['id'] or not event['loan_id']:
-        logger.error("Error: params unidentified")
-        raise Exception("Error: params unidentified")
+    if not event['loan_id'] or len(event) != 1:
+        logger.error("Error: params incorrect")
+        raise Exception("Error: params incorrect")
 
     conn = get_db();
     curr = conn.cursor()
@@ -97,11 +97,10 @@ def get_loan_details(event, context):
                 sql_cols,
                 None,
                 **{LOANS_STATUS_COL : LOANS_STATUS_VAL_BIDDING,
-                'id' : ':1',
-                'loan_id_out' : ':2'})
+                'loan_id_out' : ':1'})
 
     try:
-        curr.execute(sql_str, (event['id'], str(event['loan_id']),))
+        curr.execute(sql_str, (str(event['loan_id']),))
     except Exception as e:
         logger.error("Error: database query error", e.message, e.args)
         raise Exception("Error: database query error")
@@ -172,6 +171,5 @@ def date_handler(obj):
 if __name__ == "__main__":
     #test functions
     print get_live_loans(None, None)
-    event = {'id' : 2679,
-    'loan_id' : 'CWD-010890002'}
+    event = {'loan_id' : 'CWD-010890002'}
     print get_loan_details(event, None)
