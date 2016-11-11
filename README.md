@@ -2,9 +2,14 @@
 
 ## Initial Set Up
 
+<<<<<<< HEAD
 1. Ensure u have python 2.7 (aws uses that) and the following libraries:
     - pip
     - json
+=======
+1. Ensure u have python 2.7 (aws uses that)
+    1a.
+>>>>>>> dev
 
 2. Install serverless framework & virtialenv
 
