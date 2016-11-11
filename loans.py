@@ -60,10 +60,7 @@ def get_live_loans(event, context):
         logger.error("Error: database query error")
         raise Exception("Error: database query error")
 
-    response = {
-         "statusCode": 200,
-         "body":  json.dumps(curr.fetchall(), default=date_handler)
-    }
+    response = json.dumps(curr.fetchall(), default=date_handler)
     curr.close() #close connection *important
     return response
 
@@ -105,10 +102,7 @@ def get_loan_details(event, context):
         logger.error("Error: database query error", e.message, e.args)
         raise Exception("Error: database query error")
 
-    response = {
-         "statusCode": 200,
-         "body":  json.dumps(curr.fetchone(), default=date_handler)
-    }
+    response = json.dumps(curr.fetchone(), default=date_handler)
     curr.close()
     return response
 
