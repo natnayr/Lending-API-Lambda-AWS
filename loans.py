@@ -60,12 +60,20 @@ def get_live_loans(event, context):
         logger.error("Error: database query error")
         raise Exception("Error: database query error")
 
-    # description = [column[0] for column in curr.description]
-    # result = []
-    # for row in curr.fetchall():
-    #     result.append(dict(zip(description, row)))
+    try:
+        description = [column[0] for column in curr.description]
+        result = []
+        for row in curr.fetchall():
+            for i, x in enumerate(row):
+                if isinstance(x, datetime.date):
+                    row[i] = x.__str__()
+            result.append(dict(zip(description, row)))
+    except:
+        logger.error("Error: sorting and string converting error")
+        raise Exception("Error: sorting and string converting error")
 
-    response = json.dumps(curr.fetchall(), default=date_handler)
+    # response = json.dumps(result, default=date_handler)
+    response = result
 
     curr.close() #close connection *important
     return response
@@ -108,11 +116,19 @@ def get_loan_details(event, context):
         logger.error("Error: database query error", e.message, e.args)
         raise Exception("Error: database query error")
 
-    description = [column[0] for column in curr.description]
+    try:
+        description = [column[0] for column in curr.description]
+        row = curr.fetchone()
+        for i, x in enumerate(row):
+            if isinstance(x, datetime.date):
+                row[i] = x.__str__()
+        result = dict(zip(description, row))
+    except Exception as e:
+        logger.error("Error: sorting error", e.message, e.args)
+        raise Exception("Error: sorting error")
 
-    result = dict(zip(description, curr.fetchone()))
-
-    response = json.dumps(result, default=date_handler)
+    # response = json.dumps(result, default=date_handler)
+    response = result
 
     curr.close()
     return response
@@ -167,14 +183,13 @@ def read(table, cols, orderby, **kwargs):
 #     sql.append(";")
 #     return "".join(sql)
 
-def date_handler(obj):
-    if hasattr(obj, 'isoformat'):
-        return obj.isoformat()
-    else:
-        raise TypeError
+# Date Converter to string
+# def date_handler(obj):
+#     if isinstance(obj, datetime.date):
+#             return obj.__str__()
 
 if __name__ == "__main__":
     #test functions
-    print get_live_loans(None, None)
-    event = {'loan_id' : 'CWD-010890002'}
+    # print get_live_loans(None, None)
+    event = {'loan_id' : 'CWD0012793'}
     print get_loan_details(event, None)
