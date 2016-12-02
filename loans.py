@@ -33,13 +33,13 @@ def get_live_loans(event, context):
                 "loan_status",
                 "loan_id_out",
                 "grade",
+                "currency_out",
                 "interest_rate_out",
                 "target_amount_out",
-                "funding_amount_to_complete_cache",
                 "tenure_out",
+                "frequency_out",
                 "security",
 	            "collateral_out",
-	            "collateral_description_out",
 	            "funding_duration",
 	            "funding_start_date",
 	            "funding_end_date",
@@ -190,6 +190,6 @@ def read(table, cols, orderby, **kwargs):
 
 if __name__ == "__main__":
     #test functions
-    # print get_live_loans(None, None)
-    event = {'loan_id' : 'CWD0012793'}
+    print get_live_loans(None, None)
+    event = {'loan_id' : 'CWD0013281'}
     print get_loan_details(event, None)
