@@ -102,6 +102,8 @@ def get_loan_details(event, context):
 	            "funding_start_date",
 	            "funding_end_date",
 	            "funded_percentage_cache",
+                "start_date_out",
+                "loan_type",
 	            "sort_weight"]
 
     sql_str = read(LOANS_TABLE,
