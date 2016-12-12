@@ -65,7 +65,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/lending-mobile-api/dev/1481013490002-2016-12-06T08:38:10.002Z/lending-mobile-api.zip"
+          "S3Key": "serverless/lending-mobile-api/dev/1481543732147-2016-12-12T11:55:32.147Z/lending-mobile-api.zip"
         },
         "FunctionName": "lending-mobile-api-dev-getLiveLoans",
         "Handler": "loans.get_live_loans",
@@ -87,7 +87,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/lending-mobile-api/dev/1481013490002-2016-12-06T08:38:10.002Z/lending-mobile-api.zip"
+          "S3Key": "serverless/lending-mobile-api/dev/1481543732147-2016-12-12T11:55:32.147Z/lending-mobile-api.zip"
         },
         "FunctionName": "lending-mobile-api-dev-getLoanDetails",
         "Handler": "loans.get_loan_details",

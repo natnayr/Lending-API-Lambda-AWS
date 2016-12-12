@@ -20,6 +20,9 @@ LOANS_TABLE = "loans"
 LOANS_STATUS_COL = "loan_status"
 LOANS_STATUS_VAL_BIDDING = "'bidding'"
 
+REPAYMENT_SCHEDULE_TABLE = "repayment_schedule_ins"
+
+
 # sort conditions
 LOAN_SORT_SECURITY = "security DESC"
 LOAN_SORT_WEIGHT = "sort_weight DESC"
@@ -31,15 +34,15 @@ def get_live_loans(event, context):
     curr = conn.cursor()
     sql_cols = ["id",
                 "loan_status",
-                "loan_id_out",
+                "loan_id_out AS loan_id",
                 "grade",
-                "currency_out",
-                "interest_rate_out",
-                "target_amount_out",
-                "tenure_out",
-                "frequency_out",
+                "currency_out AS currency",
+                "interest_rate_out AS interest_rate",
+                "target_amount_out AS target_amount",
+                "tenure_out AS tenure",
+                "frequency_out AS frequency",
                 "security",
-	            "collateral_out",
+	            "collateral_out AS collateral",
 	            "funding_duration",
 	            "funding_start_date",
 	            "funding_end_date",
@@ -52,6 +55,7 @@ def get_live_loans(event, context):
 
     sql_str = read(LOANS_TABLE,
                 sql_cols,
+                None,
                 sql_sorts,
                 **{LOANS_STATUS_COL : LOANS_STATUS_VAL_BIDDING})
     try:
@@ -87,30 +91,41 @@ def get_loan_details(event, context):
     conn = get_db();
     curr = conn.cursor()
 
-    sql_cols = ["id",
-                "loan_status",
-                "loan_id_out",
-                "grade",
-                "interest_rate_out",
-                "target_amount_out",
-                "funding_amount_to_complete_cache",
-                "tenure_out",
-                "security",
-	            "collateral_out",
-	            "collateral_description_out",
-	            "funding_duration",
-	            "funding_start_date",
-	            "funding_end_date",
-	            "funded_percentage_cache",
-                "start_date_out",
-                "loan_type",
-	            "sort_weight"]
+    sql_cols = ["lns.id",
+                "lns.loan_status",
+                "lns.loan_id_out AS loan_id",
+                "lns.grade",
+                "lns.currency_out AS currency",
+                "lns.interest_rate_out AS interest_rate",
+                "lns.target_amount_out AS target_amount",
+                "lns.funding_amount_to_complete_cache",
+                "lns.frequency_out AS frequency",
+                "lns.tenure_out AS tenure",
+                "lns.security",
+	            "lns.collateral_out AS collateral",
+	            "lns.collateral_description_out AS collateral_description",
+	            "lns.funding_duration",
+	            "lns.funding_start_date",
+	            "lns.funding_end_date",
+	            "lns.funded_percentage_cache",
+                "lns.start_date_out AS start_date",
+                "lns.loan_type",
+	            "lns.sort_weight",
+                "min(rps.expected_date) AS first_repayment",
+                "max(rps.expected_date) as last_repayment"]
 
-    sql_str = read(LOANS_TABLE,
+    table_sql = (REPAYMENT_SCHEDULE_TABLE +" rps INNER JOIN " +
+                    LOANS_TABLE + " lns ON lns.id = rps.loan_id")
+
+    sql_group_by = ["lns.id"]
+
+    sql_str = read(table_sql,
                 sql_cols,
+                sql_group_by,
                 None,
                 **{LOANS_STATUS_COL : LOANS_STATUS_VAL_BIDDING,
-                'loan_id_out' : ':1'})
+                'lns.loan_id_out' : ':1 '})
+
 
     try:
         curr.execute(sql_str, (str(event['loan_id']),))
@@ -129,8 +144,9 @@ def get_loan_details(event, context):
         logger.error("Error: sorting error", e.message, e.args)
         raise Exception("Error: sorting error")
 
-    # response = json.dumps(result, default=date_handler)
     response = result
+
+
 
     curr.close()
     return response
@@ -147,13 +163,15 @@ def get_db():
     return conn
 
 
-def read(table, cols, orderby, **kwargs):
+def read(table, cols, groupby, orderby, **kwargs):
     """ Generates SQL for a SELECT statement matching the kwargs passed. """
     sql = list()
     cols_str = ", ".join(cols)
     sql.append("SELECT %s FROM %s " % (cols_str, table))
     if kwargs:
         sql.append("WHERE " + " AND ".join("%s = %s" % (k, v) for k, v in kwargs.iteritems()))
+    if groupby is not None:
+        sql.append("GROUP BY " + ", ".join("%s" % v for v in groupby))
     if orderby is not None:
         sql.append("ORDER BY " + ", ".join("%s" % v for v in orderby))
     sql.append(";")
@@ -193,5 +211,5 @@ def read(table, cols, orderby, **kwargs):
 if __name__ == "__main__":
     #test functions
     print get_live_loans(None, None)
-    event = {'loan_id' : 'CWD0013281'}
+    event = {'loan_id' : 'CWD0013286'}
     print get_loan_details(event, None)
