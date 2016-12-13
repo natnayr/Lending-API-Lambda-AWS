@@ -112,7 +112,7 @@ def get_loan_details(event, context):
                 "lns.loan_type",
 	            "lns.sort_weight",
                 "min(rps.expected_date) AS first_repayment",
-                "max(rps.expected_date) as last_repayment"]
+                "max(rps.expected_date) AS last_repayment"]
 
     table_sql = (REPAYMENT_SCHEDULE_TABLE +" rps INNER JOIN " +
                     LOANS_TABLE + " lns ON lns.id = rps.loan_id")
