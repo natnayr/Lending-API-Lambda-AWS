@@ -20,7 +20,7 @@ LOANS_TABLE = "loans"
 LOANS_STATUS_COL = "loan_status"
 LOANS_STATUS_VAL_BIDDING = "'bidding'"
 
-REPAYMENT_SCHEDULE_TABLE = "repayment_schedule_ins"
+REPAYMENT_SCHEDULE_TABLE = "repayment_schedule_outs"
 
 
 # sort conditions
@@ -84,7 +84,7 @@ def get_live_loans(event, context):
 
 def get_loan_details(event, context):
 
-    if not event['loan_id'] or len(event) != 1:
+    if not event['id'] or len(event) != 1:
         logger.error("Error: params incorrect")
         raise Exception("Error: params incorrect")
 
@@ -111,8 +111,8 @@ def get_loan_details(event, context):
                 "lns.start_date_out AS start_date",
                 "lns.loan_type",
 	            "lns.sort_weight",
-                "min(rps.expected_date) AS first_repayment",
-                "max(rps.expected_date) AS last_repayment"]
+                "MIN(rps.expected_date) AS first_repayment",
+                "MAX(rps.expected_date) AS last_repayment"]
 
     table_sql = (REPAYMENT_SCHEDULE_TABLE +" rps INNER JOIN " +
                     LOANS_TABLE + " lns ON lns.id = rps.loan_id")
@@ -124,11 +124,10 @@ def get_loan_details(event, context):
                 sql_group_by,
                 None,
                 **{LOANS_STATUS_COL : LOANS_STATUS_VAL_BIDDING,
-                'lns.loan_id_out' : ':1 '})
-
+                'lns.id' : ':1 '})
 
     try:
-        curr.execute(sql_str, (str(event['loan_id']),))
+        curr.execute(sql_str, (event['id'],))
     except Exception as e:
         logger.error("Error: database query error", e.message, e.args)
         raise Exception("Error: database query error")
@@ -145,8 +144,6 @@ def get_loan_details(event, context):
         raise Exception("Error: sorting error")
 
     response = result
-
-
 
     curr.close()
     return response
@@ -211,5 +208,5 @@ def read(table, cols, groupby, orderby, **kwargs):
 if __name__ == "__main__":
     #test functions
     print get_live_loans(None, None)
-    event = {'loan_id' : 'CWD0013286'}
+    event = {'id' : 3286}
     print get_loan_details(event, None)
